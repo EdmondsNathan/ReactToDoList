@@ -1,70 +1,31 @@
-import { useEffect, useState } from 'react';
-
-type Task = {
-    id: number;
-    text: string;
-    completed: boolean;
-}
-
-type TaskProps = {
-    task: Task;
-}
-
-type NewTaskProps = {
-    onAdd: (task: Task) => void;
-}
+import { useState } from 'react';
+import type { Task, /*TaskItemProps, NewTaskProps*/ } from './Types/Types_Tasks';
+import { NewTask, TaskItem } from './Components/Components_Tasks';
 
 function App() {
     const [tasks, setTasks] = useState<Task[]>([]);
 
-    return (
-        <>
-            <h1>Todo List</h1>
-            <NewTask onAdd={(task) => setTasks([...tasks, task])} />
-            <ul>
-                {tasks.map((task) => (
-                    <TaskItem key={task.id} task={task} />
-                ))}
-            </ul>
-        </>
-    )
-}
+    const UpdateTask = (updatedTask: Task) => {
+        setTasks(previousTasks =>
+            previousTasks.map(task =>
+                task.id === updatedTask.id ? updatedTask : task
+            )
+        );
+    }
 
-function NewTask({ onAdd }: NewTaskProps) {
-    const [text, setText] = useState("");
-
-    function createNewTask(text: string) {
-        if (!text.trim()) {
-            return;
-        }
-
-        const newTask: Task = {
-            id: Date.now(), // unique-ish ID
-            text,
-            completed: false,
-        };
-
-        setText("");
-        onAdd(newTask);
+    const DeleteTask = (id: number) => {
+        setTasks(previousTasks => previousTasks.filter(task => task.id !== id));
     }
 
     return (
-        <div>
-            <input type="text" placeholder="New Task" value={text} onChange={(e) => setText(e.target.value)} onKeyDown={((e) => e.key == 'Enter' && createNewTask(text))} />
-            <button onClick={() => {
-                createNewTask(text);
-            }}>Add</button>
-        </div >
-    )
-}
-
-function TaskItem({ task }: TaskProps) {
-    return (
         <>
-            <input type="checkbox" checked={task.completed} />
-            <p>{task.text}</p>
-            <button>Delete</button>
-            <br />
+            <h1>To-do List</h1>
+            <NewTask onAdd={(task) => setTasks([...tasks, task])} />
+            <ul>
+                {tasks.map((task) => (
+                    <TaskItem key={task.id} task={task} setTask={UpdateTask} handleDelete={DeleteTask} />
+                ))}
+            </ul>
         </>
     )
 }
