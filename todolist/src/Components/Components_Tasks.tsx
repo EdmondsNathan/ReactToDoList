@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Task, TaskItemProps, NewTaskProps } from '../Types/Types_Tasks';
+import styles from '../CSS/TaskItem.module.css';
 
 export function TaskItem({ task, setTask, handleDelete }: TaskItemProps) {
     const handleCheckBox = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -7,12 +8,12 @@ export function TaskItem({ task, setTask, handleDelete }: TaskItemProps) {
     }
 
     return (
-        <>
+        <div className={styles.taskItem}>
             <input type="checkbox" checked={task.completed} onChange={handleCheckBox} />
-            <p>{task.text}</p>
+            <p className={task.completed ? styles.completed : ""}>{task.text}</p>
             <button onClick={() => handleDelete(task.id)}>Delete</button>
             <br />
-        </>
+        </div>
     )
 }
 
