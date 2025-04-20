@@ -6,14 +6,17 @@ export function TaskItem({ task, setTask, handleDelete }: TaskItemProps) {
     const handleCheckBox = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTask({ ...task, completed: e.target.checked });
     }
+        ;/* const HandleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTask({ ...task, text: e.target.value });
+    }*/
 
     return (
         <div className={styles.taskItem}>
             <input type="checkbox" checked={task.completed} onChange={handleCheckBox} />
-            <p className={task.completed ? styles.completed : ""}>{task.text}</p>
+            <TaskItemText task={task} setTask={setTask} handleDelete={handleDelete} />
             <button onClick={() => handleDelete(task.id)}>Delete</button>
             <br />
-        </div>
+        </div >
     )
 }
 
@@ -26,7 +29,7 @@ export function NewTask({ onAdd }: NewTaskProps) {
         }
 
         const newTask: Task = {
-            id: Date.now(), // unique-ish ID
+            id: Date.now(),
             text,
             completed: false,
         };
@@ -37,10 +40,64 @@ export function NewTask({ onAdd }: NewTaskProps) {
 
     return (
         <div>
-            <input type="text" placeholder="New Task" value={text} onChange={(e) => setText(e.target.value)} onKeyDown={((e) => e.key == 'Enter' && CreateNewTask(text))} />
-            <button onClick={() => {
-                CreateNewTask(text);
-            }}>Add</button>
+            <input
+                type="text"
+                placeholder="New Task"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onKeyDown={((e) => e.key == 'Enter' && CreateNewTask(text))}
+                autoFocus
+            />
+            <button
+                onClick={() => {
+                    CreateNewTask(text);
+                }}>Add</button>
         </div >
     )
+}
+
+function TaskItemText({ task, setTask }: TaskItemProps) {
+    const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTask({ ...task, text: e.target.value });
+    };
+
+    const handleClick = () => {
+        setEdit(true);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>, shouldEdit: boolean) => {
+        if (e.key === 'Enter') {
+            setEdit(shouldEdit);
+        }
+    };
+
+    const [edit, setEdit] = useState(false);
+
+    if (edit == true && task.completed == true) {
+        setEdit(false);
+    }
+
+    if (edit == false) {
+        return (
+            <p
+                tabIndex={0}
+                className={task.completed ? styles.completed : ""}
+                onKeyDown={(e) => handleKeyDown(e, true)}
+                onClick={handleClick}
+            >
+                {task.text}
+            </p>
+        );
+    } else {
+        return (
+            <input
+                type="text"
+                value={task.text}
+                onChange={handleTextChange}
+                onBlur={() => setEdit(false)}
+                onKeyDown={(e) => handleKeyDown(e, false)}
+                autoFocus
+            />
+        );
+    }
 }
